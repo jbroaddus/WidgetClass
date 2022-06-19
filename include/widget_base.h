@@ -17,6 +17,9 @@ class WidgetBase
   virtual void resize(const size_t new_size) =0;
   virtual void clear() =0;
 
+  protected:
+  virtual void printOutput(const std::string& ouput_string) const =0;
+
 };
 
 } // end of widget_class namespace
