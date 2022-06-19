@@ -80,6 +80,7 @@ class WidgetRaw : public WidgetBase<T>
   {
     if(RAII_output_)
       printOutput("Destructor ()");
+    delete[] allocated_resource_;
 
   }
 
@@ -148,12 +149,14 @@ class WidgetRaw : public WidgetBase<T>
       new_allocated_resource[i] = allocated_resource_[i];
     delete[] allocated_resource_;
     allocated_resource_ = new_allocated_resource;
+    size_ = new_size;
   }
 
   template<typename T>
   void WidgetRaw<T>::clear() 
   {
     delete[] allocated_resource_;
+    size_ = 0;
   }
 
   template<typename T>
