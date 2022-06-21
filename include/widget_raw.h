@@ -39,6 +39,7 @@ class WidgetRaw : public WidgetBase<T>
 
   // Overriden inherrited functions
   T& operator[](const size_t i) override;
+  T& at(const size_t i) override;
   const size_t size() const override;
   void changeAlias(const std::string& new_alias) override;
   const std::string& getAlias() const override;
@@ -59,16 +60,19 @@ class WidgetRaw : public WidgetBase<T>
 
 };
 
+
 // public member function definitions
   template<typename T>
   WidgetRaw<T>::WidgetRaw() 
+    : alias_(""), size_(10), allocated_resource_(new T[10]), RAII_output_(true)
   {
     if(RAII_output_)
       printOutput("Default constructor ()");
   }
 
   template<typename T>
-  WidgetRaw<T>::WidgetRaw(const size_t i, const std::string& init_alias="", const bool RAII_output=false) 
+  WidgetRaw<T>::WidgetRaw(const size_t i, const std::string& init_alias="", const bool RAII_output=false)
+    : size_(i), alias_(init_alias), RAII_output_(RAII_output)
   {
     if(RAII_output_)
       printOutput("Parameterized constructor ()");
@@ -81,39 +85,67 @@ class WidgetRaw : public WidgetBase<T>
     if(RAII_output_)
       printOutput("Destructor ()");
     delete[] allocated_resource_;
-
   }
 
   template<typename T>
   WidgetRaw<T>::WidgetRaw(const WidgetRaw<T>& rhs)
+    : alias_(rhs.alias_), size_(rhs.size_), allocated_resource_(new T[size_]), RAII_output_(rhs.RAII_output_)
   {
     if(RAII_output_)
       printOutput("Copy constructor ()");
+    for (int i = 0; i < size_; ++i)
+      allocated_resource_[i] = rhs.allocated_resource_[i];
   }
 
   template<typename T> 
   WidgetRaw<T>::WidgetRaw(WidgetRaw<T>&& rhs)
+  : alias_(std::move(rhs.alias_)), size_(rhs.size_), RAII_output_(rhs.RAII_output_)
   {
     if(RAII_output_)
       printOutput("Move constructor ()");
+    allocated_resource_ = rhs.allocated_resource_;
+    rhs.allocated_resource_ = nullptr;    
+    rhs.size_ = 0;
   }
+
 
   template<typename T>
   WidgetRaw<T>& WidgetRaw<T>::operator=(const WidgetRaw<T>& rhs) 
   {
+    alias_ = rhs.alias_;
+    size_ = rhs.size_;
+    RAII_output_ = rhs.RAII_output_;
     if(RAII_output_)
       printOutput("Copy = operator ()");
+    delete[] allocated_resource_;
+    allocated_resource_ = new T[size_];
+    for (int i = 0; i < size_; ++i) 
+      allocated_resource_[i] = rhs.allocated_resource_[i]
   }
+
 
   template<typename T>
   WidgetRaw<T>& WidgetRaw<T>::operator=(WidgetRaw<T>&& rhs) 
   {
+    alias_ = std::move(rhs.alias_);
+    size_ = rhs.size_;
+    RAII_output_ = rhs.RAII_output_;
     if(RAII_output_)
-      printOutput("Move = oeprator ()");
+      printOutput("Move = operator ()");
+    delete[] allocated_resource_;
+    allocated_resource_ = rhs.allocated_resource_;
+    rhs.allocated_resource_= nullptr;
+    rhs.size_ = 0;
   }
 
   template<typename T>
   T& WidgetRaw<T>::operator[](const size_t i) 
+  {
+    return allocated_resource_[i];
+  }
+
+  template<typename T>
+  T& WidgetRaw<T>::at(const size_t i) 
   {
     if (i < 0 || i > size_ - 1)
       throw std::out_of_range("Exceeds range of indices: " + std::to_string(i));
@@ -139,7 +171,6 @@ class WidgetRaw : public WidgetBase<T>
     return alias_;
   }
 
-
   // Will truncate the old array if new_size < size_
   template<typename T>
   void WidgetRaw<T>::resize(const size_t new_size) 
@@ -162,9 +193,8 @@ class WidgetRaw : public WidgetBase<T>
   template<typename T>
   void WidgetRaw<T>::printOutput(const std::string& output_string) const
   {
-    std::cout << "WidgetRawOUT(" << this << ") - " << output_string << std::endl;
+    std::cout << "WidgetRawOUT(" << alias_ << " <" << this << ">) - " << output_string << std::endl;
   }
-  
 
 
 } // end of widget_class namespace
