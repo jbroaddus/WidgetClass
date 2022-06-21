@@ -210,7 +210,7 @@ class WidgetRaw : public WidgetBase<T>
   template<typename T>
   void WidgetRaw<T>::printOutput(const std::string& output_string) const
   {
-    std::cout << "WidgetRawOUT(" << alias_ << " <" << this << ">)\n\t- " << output_string << std::endl;
+    std::cout << "WidgetRawOUT(" << alias_ << " <" << this << ">) - " << output_string << std::endl;
   }
 
 

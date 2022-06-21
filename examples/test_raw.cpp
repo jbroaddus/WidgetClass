@@ -18,6 +18,15 @@ int main(int argc, char** argv)
   std::cout << "Widget_size: " << wr_obj.size() << std::endl; 
   std::cout << std::endl;
   printRawWidgetByValue<int>(wr_obj);
+  // attempting to access out of bounds
+  try 
+  {
+    wr_obj.at(10);
+  }
+  catch(const std::exception& e)
+  {
+    std::cout << "Exception caught: " << e.what() << std::endl;
+  }
   return 0;
 }
 
