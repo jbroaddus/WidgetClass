@@ -39,7 +39,9 @@ class WidgetRaw : public WidgetBase<T>
 
   // Overriden inherrited functions
   T& operator[](const size_t i) override;
+  const T& operator[](const size_t i) const override;
   T& at(const size_t i) override;
+  const T& at(const size_t i) const override;
   const size_t size() const override;
   void changeAlias(const std::string& new_alias) override;
   const std::string& getAlias() const override;
@@ -71,7 +73,7 @@ class WidgetRaw : public WidgetBase<T>
   }
 
   template<typename T>
-  WidgetRaw<T>::WidgetRaw(const size_t i, const std::string& init_alias="", const bool RAII_output=false)
+  WidgetRaw<T>::WidgetRaw(const size_t i, const std::string& init_alias, const bool RAII_output)
     : size_(i), alias_(init_alias), RAII_output_(RAII_output)
   {
     if(RAII_output_)
@@ -120,7 +122,7 @@ class WidgetRaw : public WidgetBase<T>
     delete[] allocated_resource_;
     allocated_resource_ = new T[size_];
     for (int i = 0; i < size_; ++i) 
-      allocated_resource_[i] = rhs.allocated_resource_[i]
+      allocated_resource_[i] = rhs.allocated_resource_[i];
   }
 
 
@@ -145,7 +147,22 @@ class WidgetRaw : public WidgetBase<T>
   }
 
   template<typename T>
+  const T& WidgetRaw<T>::operator[](const size_t i) const
+  {
+    return allocated_resource_[i];
+  }
+
+  template<typename T>
   T& WidgetRaw<T>::at(const size_t i) 
+  {
+    if (i < 0 || i > size_ - 1)
+      throw std::out_of_range("Exceeds range of indices: " + std::to_string(i));
+    
+    return allocated_resource_[i];
+  }
+  
+  template<typename T>
+  const T& WidgetRaw<T>::at(const size_t i) const 
   {
     if (i < 0 || i > size_ - 1)
       throw std::out_of_range("Exceeds range of indices: " + std::to_string(i));
@@ -193,7 +210,7 @@ class WidgetRaw : public WidgetBase<T>
   template<typename T>
   void WidgetRaw<T>::printOutput(const std::string& output_string) const
   {
-    std::cout << "WidgetRawOUT(" << alias_ << " <" << this << ">) - " << output_string << std::endl;
+    std::cout << "WidgetRawOUT(" << alias_ << " <" << this << ">)\n\t- " << output_string << std::endl;
   }
 
 

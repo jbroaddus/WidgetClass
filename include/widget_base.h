@@ -10,8 +10,10 @@ class WidgetBase
   public:
 
   // Pure virtual functions to be implemented by child classes 
-  virtual T& operator[](const size_t i) =0
+  virtual T& operator[](const size_t i) =0;
+  virtual const T& operator[](const size_t i) const =0;
   virtual T& at(const size_t i) =0;
+  virtual const T& at(const size_t i) const =0;
   virtual const size_t size() const =0;
   virtual void changeAlias(const std::string& new_alias) =0;
   virtual const std::string& getAlias() const =0;
