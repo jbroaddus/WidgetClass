@@ -23,7 +23,7 @@ class WidgetRaw : public WidgetBase<T>
   WidgetRaw(const size_t i, const std::string& init_alias="", const bool RAII_output=false);
 
   // User defined destructor (necessitates Ro5)
-  ~WidgetRaw();
+  virtual ~WidgetRaw();
 
   // copy constructor
   WidgetRaw(const WidgetRaw<T>& rhs);

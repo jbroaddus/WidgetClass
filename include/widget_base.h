@@ -10,6 +10,7 @@ class WidgetBase
   public:
 
   // Pure virtual functions to be implemented by child classes 
+  virtual ~WidgetBase(){}
   virtual T& operator[](const size_t i) =0;
   virtual const T& operator[](const size_t i) const =0;
   virtual T& at(const size_t i) =0;

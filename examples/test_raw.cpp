@@ -27,6 +27,14 @@ int main(int argc, char** argv)
   {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }
+
+  widget_class::WidgetBase<int>* wr_ptr = new widget_class::WidgetRaw<int>();
+
+  std::cout << "Deleting now" << std::endl;
+  delete wr_ptr;
+  std::cout << "Destructor should have been called" << std::endl;
+
+
   return 0;
 }
 
