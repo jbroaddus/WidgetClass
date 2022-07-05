@@ -73,7 +73,7 @@ WidgetRaw<T>::WidgetRaw()
 
 template<typename T>
 WidgetRaw<T>::WidgetRaw(const size_t i, const std::string& init_alias, const bool RAII_output)
-  : size_(i), alias_(init_alias), RAII_output_(RAII_output)
+  : size_(i), alias_(init_alias), allocated_resource_(new T[10]), RAII_output_(RAII_output)
 {
   if(RAII_output_)
     printOutput("Parameterized constructor ()");
@@ -138,7 +138,7 @@ WidgetRaw<T>& WidgetRaw<T>::operator=(WidgetRaw<T>&& rhs)
   alias_ = std::move(rhs.alias_);
   size_ = rhs.size_;
   RAII_output_ = rhs.RAII_output_;
-      delete[] allocated_resource_;
+  delete[] allocated_resource_;
   allocated_resource_ = rhs.allocated_resource_;
   rhs.allocated_resource_= nullptr;
   rhs.size_ = 0;
