@@ -114,8 +114,7 @@ WidgetSmart<T>& WidgetSmart<T>::operator=(const WidgetSmart<T>& rhs)
   alias_ = rhs.alias_;
   size_ rhs.size_;
   RAII_output_ = rhs.RAII_output_;
-  allocated_resource_ = nullptr;
-  allocated_resource_ = std::make_unique(T[size_]);
+  allocated_resource_.reset(std::make_unique(T[size_]));
   for (int i = 0; i < size_; ++i) 
     allocated_resource_[i] = rhs.allocated_resource_[i];
   return *this;
@@ -124,44 +123,83 @@ WidgetSmart<T>& WidgetSmart<T>::operator=(const WidgetSmart<T>& rhs)
 // move assignment operator
 template<typename T>
 WidgetSmart<T>& WidgetSmart<T>::operator=(WidgetSmart<T>&& rhs)
-{}
+{
+  if (RAII_output_)
+    printOutput("Move = operator ()");
+  if (this == &rhs)
+    return *this;
+  alias_ = std::move(rhs.alias_);
+  size_ = rhs.size_;
+  RAII_output_ = rhs.RAII_output_;
+  allocated_resource_ = std::move(rhs.allocated_resource_);
+  return *this;
+}
 
 // Overriden inherrited functions
 template<typename T>
 T& WidgetSmart<T>::operator[](const size_t i) 
-{} 
+{
+  return allocated_resource_[i];
+} 
 
 template<typename T>
 const T& WidgetSmart<T>::operator[](const size_t i) const 
-{} 
+{
+  return allocated_resource_[i];
+} 
 
 template<typename T>
 T& WidgetSmart<T>::at(const size_t i) 
-{} 
+{
+  if (i < 0 || i  > size_ - 1)
+    throw std::out_of_range("Exceeds range of indices: " + std::to_string(i));
+
+  return allocated_resource_[i];
+} 
 
 template<typename T>
 const T& WidgetSmart<T>::at(const size_t i) const 
-{} 
+{
+  if (i < 0 || i  > size_ - 1)
+      throw std::out_of_range("Exceeds range of indices: " + std::to_string(i));
+
+    return allocated_resource_[i];
+} 
 
 template<typename T>
 const size_t WidgetSmart<T>::size() const 
-{} 
+{
+  return size_;
+} 
 
 template<typename T>
 void WidgetSmart<T>::changeAlias(const std::string& new_alias) 
-{} 
+{
+  alias_ = new_alias;
+} 
 
 template<typename T>
 const std::string& WidgetSmart<T>::getAlias() const 
-{} 
+{
+  return alias_;
+} 
 
 template<typename T>
 void WidgetSmart<T>::resize(const size_t new_size) 
-{} 
+{
+  std::unique_ptr<T[]> new_allocated_resource = std::make_unique(T[new_size]);
+  for (int i = 0; i < (new_size > size_ ? size_ : new_size); ++i) 
+    new_allocated_resource[i] = allocated_resource_[i];
+  allocated_resource_ = std::move(new_allocated_resource);
+  size_ = new_size;
+} 
 
 template<typename T>
 void WidgetSmart<T>::clear() 
-{} 
+{
+  allocated_resource_.reset();
+  size_ = 0;
+} 
 
 
 }
